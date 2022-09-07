@@ -1,16 +1,16 @@
 const requestURL = 'http://localhost:8080/api/users';
-
 const usersTableNavLink = document.getElementById("horizontal_navigation-users_table");
 const allUsersTable = document.querySelector(".all-users-table");
 
 //------------- Таблица со всеми юзерами -------------//
 
 // Генерация кода для заполнения таблицы данными обо всех юзерах
+
 const renderUsers = (users) => {
     if (users.length > 0) {
-        let temp = '';
+        let table = '';
         users.forEach((user) => {
-            temp += `
+            table += `
                 <tr>
                     <td> ${user.id} </td>
                     <td> ${user.username} </td>
@@ -20,16 +20,16 @@ const renderUsers = (users) => {
                     <td> ${user.roles.map((role) => role.name === "ROLE_USER" ? " USER" : " ADMIN")} </td>
                     <td> <button type="button" class="btn btn-info" id="btn-edit-modal-call" data-toggle="modal" data-target="modal-edit"
                     data-id="${user.id}">Edit</button></td>
-                    <td> <button type="button" class="btn btn-danger" id="btn-delete-modal-call" 
+                    <td> <button type="button" class="btn btn-danger" id="btn-delete-modal-call"
                     data-id="${user.id}">Delete</button></td>
-                </tr>
-        `
+                </tr>`
         })
-        allUsersTable.innerHTML = temp;
+        allUsersTable.innerHTML = table;
     }
 }
 
 // Получение данных всех пользователей с помощью fetch и заполнение таблицы с помощью функции renderUsers
+
 function getAllUsers() {
     fetch(requestURL, {
         method: 'GET',
@@ -96,16 +96,14 @@ addUserForm.addEventListener("submit", (e) => {
             roles: getRolesFromAddUserForm()
         })
     })
-        .then(() => {
-            usersTableNavLink.click();
-            location.reload();
-        });
+        .then(() => getAllUsers())
+        .then(() => addUserForm.reset())
+
+    $('.nav-tabs a[href="#usersTable"]').tab('show')
 })
 
 //------------- Удаление и изменение юзеров -------------//
 
-const modalEditExitBtn = document.getElementById("exit_btn-modal-edit");
-const modalEditCloseBtn = document.getElementById("close_btn-modal-edit");
 const modalEditSubmitBtn = document.getElementById("submit_btn-modal-edit");
 const editUsersRoles = document.getElementById("edit-rolesSelect");
 const editRoleAdminOption = document.getElementById("edit-role_admin");
@@ -114,23 +112,21 @@ const editRoleUserOption = document.getElementById("edit-role_user");
 const deleteRoleAdminOption = document.getElementById("delete-role_admin");
 const deleteRoleUserOption = document.getElementById("delete-role_user");
 const modalDeleteSubmitBtn = document.getElementById("submit_btn-modal-delete");
-const modalDeleteExitBtn = document.getElementById("exit_btn-modal-delete");
-const modalDeleteCloseBtn = document.getElementById("close_btn-modal-delete");
 
 function getRolesFromEditUserForm() {
     let roles = Array.from(editUsersRoles.selectedOptions)
         .map(option => option.value);
     let rolesToEdit = [];
-    if (roles.includes("1")) {
+    if (roles.includes("2")) {
         let role1 = {
-            id: 1,
+            id: 2,
             name: "ADMIN"
         }
         rolesToEdit.push(role1);
     }
-    if (roles.includes("2")) {
+    if (roles.includes("1")) {
         let role2 = {
-            id: 2,
+            id: 1,
             name: "USER"
         }
         rolesToEdit.push(role2);
@@ -185,10 +181,10 @@ allUsersTable.addEventListener("click", e => {
             fetch(`${requestURL}/${currentUserId}`, {
                 method: 'DELETE',
             })
-                .then(res => res.json());
-            modalDeleteExitBtn.click();
-            getAllUsers();
-            location.reload();
+                .then(() => getAllUsers())
+
+            $('#modal-delete').modal('hide');
+
         })
     }
 
@@ -251,50 +247,12 @@ allUsersTable.addEventListener("click", e => {
                 },
                 body: JSON.stringify(user)
             })
-                .then(res => console.log(res));
-            modalEditExitBtn.click();
-            getAllUsers();
-            location.reload();
+                .then(() => getAllUsers())
+
+            $('#modal-edit').modal('hide');
         })
     }
 })
-
-//Обработка закрытия модального окна edit
-let removeSelectedRolesFromEditDoc = () => {
-    if (editRoleAdminOption.hasAttribute('selected')) {
-        editRoleAdminOption.removeAttribute('selected')
-    }
-    if (editRoleUserOption.hasAttribute('selected')) {
-        editRoleUserOption.removeAttribute('selected')
-    }
-}
-modalEditExitBtn.addEventListener("click", e => {
-    e.preventDefault();
-    removeSelectedRolesFromEditDoc();
-})
-modalEditCloseBtn.addEventListener("click", e => {
-    e.preventDefault();
-    removeSelectedRolesFromEditDoc();
-})
-
-//Обработка закрытия модального окна delete
-let removeSelectedRolesFromDeleteDoc = () => {
-    if (deleteRoleAdminOption.hasAttribute('selected')) {
-        deleteRoleAdminOption.removeAttribute('selected')
-    }
-    if (deleteRoleUserOption.hasAttribute('selected')) {
-        deleteRoleUserOption.removeAttribute('selected')
-    }
-}
-modalDeleteExitBtn.addEventListener("click", e => {
-    e.preventDefault();
-    removeSelectedRolesFromDeleteDoc();
-})
-modalDeleteCloseBtn.addEventListener("click", e => {
-    e.preventDefault();
-    removeSelectedRolesFromDeleteDoc();
-})
-
 
 //------------- Заполнение панели юзера -------------//
 
