@@ -1,4 +1,4 @@
-const requestURL = 'http://localhost:8080/api/users';
+const requestURL = 'http://localhost:8080/api/admin';
 const usersTableNavLink = document.getElementById("horizontal_navigation-users_table");
 const allUsersTable = document.querySelector(".all-users-table");
 

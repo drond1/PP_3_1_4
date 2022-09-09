@@ -9,7 +9,7 @@ import com.kata.pp_3_1_4.models.User;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/admin")
 public class AdminController {
     private final UserService userService;
 
